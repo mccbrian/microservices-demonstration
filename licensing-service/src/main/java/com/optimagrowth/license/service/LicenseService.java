@@ -1,12 +1,17 @@
 package com.optimagrowth.license.service;
 
+import com.optimagrowth.license.controller.LicenseController;
 import com.optimagrowth.license.model.License;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
 import java.util.Random;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class LicenseService {
@@ -19,7 +24,7 @@ public class LicenseService {
     }
 
     public License getLicense(String licensedId, String organizationId) {
-        return License.builder()
+        License license = License.builder()
                 .id(random.nextInt(1000))
                 .licenseId(licensedId)
                 .organizationId(organizationId)
@@ -27,6 +32,10 @@ public class LicenseService {
                 .productName("Ostock")
                 .licenseType("full")
                 .build();
+
+        displayRelatedLinks(license, organizationId);
+
+        return license;
     }
 
     public String createLicense(License license, String organizationId, Locale locale) {
@@ -34,7 +43,7 @@ public class LicenseService {
         if (license != null) {
             license.setOrganizationId(organizationId);
             responseMessage = String
-                    .format(message.getMessage("license.create.message", null, locale), license.toString());
+                    .format(message.getMessage("license.create.message", null, locale), license);
         }
         return responseMessage;
     }
@@ -43,7 +52,7 @@ public class LicenseService {
         String responseMessage = null;
         if (license != null) {
             license.setOrganizationId(organizationId);
-            responseMessage = String.format("License %s updated", license.toString());
+            responseMessage = String.format("License %s updated", license);
         }
         return responseMessage;
     }
@@ -52,6 +61,21 @@ public class LicenseService {
         String responseMessage;
         responseMessage = String.format("Deleting license with id %s for the organization %s", licenseId, organizationId);
         return responseMessage;
+    }
+
+    private void displayRelatedLinks(@NotNull License license, String organizationId) {
+        license.add(linkTo(methodOn(LicenseController.class)
+                        .getLicense(organizationId, license.getLicenseId()))
+                        .withSelfRel(),
+                linkTo(methodOn(LicenseController.class)
+                        .createLicense(organizationId, license, null))
+                        .withRel("createLicense"),
+                linkTo(methodOn(LicenseController.class)
+                        .updateLicense(organizationId, license))
+                        .withRel("updateLicense"),
+                linkTo(methodOn(LicenseController.class)
+                        .deleteLicense(organizationId, license.getLicenseId()))
+                        .withRel("deleteLicense"));
     }
 
 }
