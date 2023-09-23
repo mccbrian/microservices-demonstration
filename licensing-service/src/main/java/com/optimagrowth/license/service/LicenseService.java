@@ -38,7 +38,7 @@ public class LicenseService {
         return license;
     }
 
-    public String createLicense(License license, String organizationId, Locale locale) {
+    public String createLicense(String organizationId, License license, Locale locale) {
         String responseMessage = null;
         if (license != null) {
             license.setOrganizationId(organizationId);
@@ -48,7 +48,7 @@ public class LicenseService {
         return responseMessage;
     }
 
-    public String updateLicense(License license, String organizationId) {
+    public String updateLicense(String organizationId, License license) {
         String responseMessage = null;
         if (license != null) {
             license.setOrganizationId(organizationId);

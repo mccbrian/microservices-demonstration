@@ -28,7 +28,8 @@ public class LicenseController {
     @PostMapping()
     public ResponseEntity<String> createLicense(@PathVariable String organizationId, @RequestBody License request,
                                                 @RequestHeader (value = "Accept-Language", required = false) Locale locale) {
-        return new ResponseEntity<>(service.createLicense(request, organizationId, locale), HttpStatus.CREATED);
+        String license = service.createLicense(organizationId, request, locale);
+        return new ResponseEntity<>(license, HttpStatus.CREATED);
     }
 
     @GetMapping("/{licenseId}")
@@ -40,7 +41,7 @@ public class LicenseController {
     @PutMapping()
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> updateLicense(@PathVariable String organizationId, @RequestBody License request) {
-        return ResponseEntity.ok(service.updateLicense(request, organizationId));
+        return ResponseEntity.ok(service.updateLicense(organizationId, request));
     }
 
     @DeleteMapping(value = "/{licenseId}")
